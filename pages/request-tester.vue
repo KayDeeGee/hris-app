@@ -1,44 +1,34 @@
 <template>
     <div class="p-6 space-y-4">
         <h1 class="text-xl font-bold">Request Tester</h1>
-  <div v-if="user" class="mt-4 p-4 border rounded bg-gray-100">
-            <pre>{{ user }}</pre>
+        <div v-if="message" class="mt-4 p-4 border rounded bg-gray-100 dark:text-gray-800">
+            <pre>{{ message }}</pre>
+            <div v-if="error" class="mt-4 text-red-600">Error: {{ error }}</div>
+
         </div>
         <div>
-            <button
-                @click="getUser"
-                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
+            <button @click="registerUser" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                Register User
+            </button>
+        </div>
+        <div>
+            <button @click="getUser" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                 Get Authenticated User
             </button>
         </div>
-
-      
-
-        <div v-if="error" class="mt-4 text-red-600">Error: {{ error }}</div>
-
         <div>
-            <button
-                @click="login"
-                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
+            <button @click="login" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                 login
             </button>
         </div>
 
-         <div>
-            <button
-                @click="storeJobPost"
-                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
+        <div>
+            <button @click="storeJobPost" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                 storeJobPost
             </button>
         </div>
         <div>
-            <button
-                @click="getJobs"
-                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
+            <button @click="getJobs" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                 getJobs
             </button>
         </div>
@@ -46,32 +36,19 @@
 </template>
 
 <script setup>
-const user = ref(null);
+const message = ref(null);
 const error = ref(null);
+
+const { getCsrfCookie } = useSanctum();
+const { fetchWithCsrf } = useApi();
 
 const getUser = async () => {
     error.value = null;
-    user.value = null;
+    message.value = null;
 
     try {
-        // First, get CSRF token
-        await $fetch("http://localhost:8000/sanctum/csrf-cookie", {
-            credentials: "include",
-        });
-
-        const token = useCookie("XSRF-TOKEN");
-
-        // Then, make the authenticated request
-        const response = await $fetch("http://localhost:8000/api/user", {
-            method: "GET",
-            credentials: "include",
-            headers: {
-                "X-XSRF-TOKEN": token.value,
-                "Content-Type": "application/json", // Ensure Content-Type is set to JSON
-            },
-        });
-
-        user.value = response;
+        const response = await fetchWithCsrf("http://localhost:8000/api/user");
+        message.value = response;
     } catch (err) {
         error.value = err?.data?.message || err.message;
     }
@@ -80,45 +57,50 @@ const getUser = async () => {
 // const { fetchWithCsrf } = useApi();
 const login = async () => {
     error.value = null;
-    user.value = null;
+    message.value = null;
 
     try {
-        // First, get CSRF token
-        await $fetch("http://localhost:8000/sanctum/csrf-cookie", {
-            credentials: "include",
-            headers: {
-                Accept: "application/json",
-            },
+        // Get CSRF token only once (first time)
+        await getCsrfCookie();
+
+        const response = await fetchWithCsrf("http://localhost:8000/api/auth/login", {
+            method: "POST",
+            body: {
+                email: "kylebryanbasco@gmail.com",
+                password: "admin123",
+            }
         });
 
-        // Get the XSRF-TOKEN cookie
-        const xsrfToken = useCookie("XSRF-TOKEN").value;
+        message.value = response;
+    } catch (err) {
+        error.value = err?.data?.message || err.message;
+    }
+};
 
-        // Then, make the authenticated request
-        const response = await $fetch("http://localhost:8000/api/auth/login", {
+const registerUser = async () => {
+    error.value = null;
+    message.value = null;
+
+    try {
+        const response = await fetchWithCsrf("http://localhost:8000/api/auth/register", {
             method: "POST",
-            credentials: "include",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-                "X-XSRF-TOKEN": xsrfToken,
-            },
             body: {
+                last_name: "Basco",
+                first_name: "Kyle Bryan",
                 email: "kylebryanbasco@gmail.com",
                 password: "admin123",
             },
         });
 
-        user.value = response;
+        message.value = response;
     } catch (err) {
         error.value = err?.data?.message || err.message;
-        console.error("Login error:", err);
     }
 };
 
 const storeJobPost = async () => {
     error.value = null;
-    user.value = null;
+    message.value = null;
 
     try {
         // Get the XSRF-TOKEN cookie
@@ -150,7 +132,7 @@ const storeJobPost = async () => {
             },
         });
 
-        user.value = response;
+        message.value = response;
     } catch (err) {
         error.value = err?.data?.message || err.message;
         console.error("Login error:", err);
@@ -159,7 +141,7 @@ const storeJobPost = async () => {
 
 const getJobs = async () => {
     error.value = null;
-    user.value = null;
+    message.value = null;
 
     try {
         // Get the XSRF-TOKEN cookie
@@ -174,9 +156,9 @@ const getJobs = async () => {
                 "Content-Type": "application/json",
                 "X-XSRF-TOKEN": xsrfToken,
             },
-        });        
+        });
 
-        user.value = response;
+        message.value = response;
     } catch (err) {
         error.value = err?.data?.message || err.message;
         console.error("Login error:", err);

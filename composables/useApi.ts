@@ -1,20 +1,19 @@
-import { useRuntimeConfig } from "nuxt/app";
-
+// composables/useApi.ts
 export const useApi = () => {
-    const config = useRuntimeConfig();
+  const xsrfToken = useCookie("XSRF-TOKEN");
 
-    const fetchWithCsrf = async (url: string, options: any = {}) => {
-        // 1. Get CSRF cookie
-        await $fetch(`${config.public.backendUrl}/sanctum/csrf-cookie`, {
-            credentials: "include",
-        });
+  const fetchWithCsrf = async (url: string, options: any = {}) => {
+    return await $fetch(url, {
+      ...options,
+      credentials: "include",
+      headers: {
+        ...(options.headers || {}),
+        "X-XSRF-TOKEN": xsrfToken.value,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+  };
 
-        // 2. Do the actual request with cookies
-        return await $fetch(`${config.public.backendUrl}${url}`, {
-            ...options,
-            credentials: "include",
-        });
-    };
-
-    return { fetchWithCsrf };
+  return { fetchWithCsrf };
 };
