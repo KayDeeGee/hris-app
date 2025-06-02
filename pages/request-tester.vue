@@ -4,73 +4,61 @@
             <h1 class="text-xl font-bold">Request Tester</h1>
 
             <div>
-                <button
-                    @click="registerUser"
-                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                >
+                <button @click="registerUser" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
                     Register User
                 </button>
             </div>
             <div>
-                <button
-                    @click="getUser"
-                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
+                <button @click="getUser" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                     Get Authenticated User
                 </button>
             </div>
             <div>
-                <button
-                    @click="login"
-                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
+                <button @click="login" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                     login
                 </button>
             </div>
 
             <div>
-                <button
-                    @click="storeJobPost"
-                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
+                <button @click="storeJobPost" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                     storeJobPost
                 </button>
             </div>
             <div>
-                <button
-                    @click="getJobs"
-                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
+                <button @click="getJobs" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                     getJobs
                 </button>
             </div>
             <div>
                 <div class="flex items-center gap-2">
-                    <input
-                        v-model="jobId"
-                        type="number"
-                        placeholder="Enter job ID"
-                        class="border rounded px-3 py-2"
-                    />
-                    <button
-                        @click="showJob"
-                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                    >
+                    <input v-model="jobId" type="number" placeholder="Enter job ID" class="border rounded px-3 py-2" />
+                    <button @click="showJob" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                         Show Job
                     </button>
                 </div>
             </div>
         </div>
         <div>
-            <div
-                v-if="message"
-                class="mt-4 p-4 border rounded bg-gray-100 dark:text-gray-800"
-            >
+            <div v-if="message" class="mt-4 p-4 border rounded bg-gray-100 dark:text-gray-800">
                 <pre>{{ message }}</pre>
                 <div v-if="error" class="mt-4 text-red-600">
                     Error: {{ error }}
                 </div>
             </div>
+        </div>
+        <div>
+            <form @submit.prevent="submitApplication" class="space-y-4">
+                <input v-model="formJobApplication.first_name" type="text" placeholder="First name" required />
+                <input v-model="formJobApplication.last_name" type="text" placeholder="Last name" required />
+                <input v-model="formJobApplication.email" type="email" placeholder="Email" required />
+                <input v-model="formJobApplication.phone" type="tel" placeholder="Phone (optional)" />
+                <textarea v-model="formJobApplication.cover_letter" placeholder="Cover letter (optional)" />
+                <input type="file" @change="e => formJobApplication.resume_path = e.target.files[0]"
+                    accept=".pdf,.doc,.docx" />
+                <button class="bg-amber-600" type="submit" :disabled="loading">
+                    {{ loading ? 'Submitting...' : 'Apply' }}
+                </button>
+            </form>
         </div>
     </div>
 </template>
@@ -83,6 +71,17 @@ const { getCsrfCookie } = useSanctum();
 const { fetchWithCsrf, fetchPublic } = useApi();
 
 const jobId = useState("jobId", () => null);
+const loading = useState('loading', () => false);
+
+const formJobApplication = reactive({
+    first_name: 'test',
+    last_name: 'test',
+    email: 'test@mail.com',
+    phone: '0999999999',
+    cover_letter: 'test',
+    job_id: 1,
+    resume_path: null
+})
 
 const getUser = async () => {
     error.value = null;
@@ -210,7 +209,7 @@ const showJob = async () => {
     error.value = null;
     message.value = null;
 
-     try {
+    try {
         const response = await fetchPublic(
             `http://localhost:8000/api/public/job-posts/${jobId.value}`,
             {
@@ -224,4 +223,31 @@ const showJob = async () => {
         console.error("Login error:", err);
     }
 };
+
+const submitApplication = async () => {
+    loading.value = true
+    const formData = new FormData()
+    for (const key in formJobApplication) {
+        if (formJobApplication[key] !== null) {
+            formData.append(key, formJobApplication[key])
+        }
+    }
+
+    try {
+        const data = await fetchWithCsrf('http://localhost:8000/api/public/job-applications', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        console.log(data.value)
+        alert('Application submitted!')
+    } catch (error) {
+        console.error(error)
+        alert('Something went wrong.')
+    } finally {
+        loading.value = false
+    }
+}
 </script>
