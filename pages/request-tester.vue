@@ -53,8 +53,8 @@
                 <input v-model="formJobApplication.email" type="email" placeholder="Email" required />
                 <input v-model="formJobApplication.phone" type="tel" placeholder="Phone (optional)" />
                 <textarea v-model="formJobApplication.cover_letter" placeholder="Cover letter (optional)" />
-                <input type="file" @change="e => formJobApplication.resume_path = e.target.files[0]"
-                    accept=".pdf,.doc,.docx" />
+                <!-- <input type="file" @change="e => formJobApplication.resume_path = e.target.files[0]"
+                    accept=".pdf,.doc,.docx" /> -->
                 <button class="bg-amber-600" type="submit" :disabled="loading">
                     {{ loading ? 'Submitting...' : 'Apply' }}
                 </button>
@@ -80,7 +80,7 @@ const formJobApplication = reactive({
     phone: '0999999999',
     cover_letter: 'test',
     job_id: 1,
-    resume_path: null
+    resume_path: 'test'
 })
 
 const getUser = async () => {
@@ -233,14 +233,18 @@ const submitApplication = async () => {
         }
     }
 
+    await getCsrfCookie();
+     const xsrfToken = useCookie("XSRF-TOKEN").value;
     try {
-        const data = await fetchWithCsrf('http://localhost:8000/api/public/job-applications', {
-            method: 'POST',
-            body: formData,
+         const response = await $fetch("http://localhost:8000/api/public/job-applications", {
+            method: "POST",
+            credentials: "include",
             headers: {
-                'Content-Type': 'application/json'
-            }
-        })
+                Accept: "application/json",
+                "X-XSRF-TOKEN": xsrfToken,
+            },
+             body: formData,
+        });
         console.log(data.value)
         alert('Application submitted!')
     } catch (error) {
