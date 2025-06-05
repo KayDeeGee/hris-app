@@ -245,7 +245,7 @@ const submitApplication = async () => {
             },
              body: formData,
         });
-        console.log(data.value)
+        // console.log(response.value)
         alert('Application submitted!')
     } catch (error) {
         console.error(error)
