@@ -32,14 +32,27 @@
 </template>
 
 <script setup lang="ts">
-const message = useState<JobApplication[] | null>('messageApplication');
+const message = useState<any | null>('messageApplication', () => null);
+
+// Fetch once on route load (SSR-compatible)
+const { data: applicationsData, error } = await useAsyncData('jobApplications', async () => {
+  const { fetchWithCsrf } = useApi();
+  return await fetchWithCsrf('/api/hr/job-applications');
+});
+
+watchEffect(() => {
+  if (applicationsData.value) {
+    message.value = applicationsData.value;
+  }
+});
+
 const applications = computed(() => message.value ?? []);
 
 const formatDate = (date: string) => {
-  return new Date(date).toLocaleString(); // or use dayjs/Intl for better formatting
+  return new Date(date).toLocaleString();
 };
 
 const viewApplication = (app: JobApplication) => {
-  console.log("Viewing application", app);
+  console.log('Viewing application', app);
 };
 </script>

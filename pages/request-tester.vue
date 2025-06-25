@@ -142,7 +142,7 @@ const getUser = async () => {
     message.value = null;
 
     try {
-        const response = await fetchWithCsrf("http://localhost:8000/api/user");
+        const response = await fetchWithCsrf("/api/user");
         message.value = response;
     } catch (err) {
         error.value = err?.data?.message || err.message;
@@ -159,7 +159,7 @@ const login = async () => {
         await getCsrfCookie();
 
         const response = await fetchWithCsrf(
-            "http://localhost:8000/api/auth/login",
+            "/api/auth/login",
             {
                 method: "POST",
                 body: {
@@ -181,7 +181,7 @@ const registerUser = async () => {
 
     try {
         const response = await fetchWithCsrf(
-            "http://localhost:8000/api/auth/register",
+            "/api/auth/register",
             {
                 method: "POST",
                 body: {
@@ -208,7 +208,7 @@ const storeJobPost = async () => {
         const xsrfToken = useCookie("XSRF-TOKEN").value;
 
         // Then, make the authenticated request
-        const response = await $fetch("http://localhost:8000/api/job-posts", {
+        const response = await $fetch("/api/job-posts", {
             method: "POST",
             credentials: "include",
             headers: {
@@ -246,7 +246,7 @@ const getJobs = async () => {
 
     try {
         const response = await fetchPublic(
-            `http://localhost:8000/api/public/job-posts`,
+            `/api/public/job-posts`,
             {
                 method: "GET",
             }
@@ -265,7 +265,7 @@ const showJob = async () => {
 
     try {
         const response = await fetchPublic(
-            `http://localhost:8000/api/public/job-posts/${jobId.value}`,
+            `/api/public/job-posts/${jobId.value}`,
             {
                 method: "GET",
             }
@@ -300,7 +300,7 @@ const submitApplication = async () => {
     const xsrfToken = useCookie("XSRF-TOKEN").value;
     try {
         const response = await $fetch(
-            "http://localhost:8000/api/public/job-applications",
+            "/api/public/job-applications",
             {
                 method: "POST",
                 credentials: "include",
