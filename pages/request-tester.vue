@@ -4,42 +4,68 @@
             <h1 class="text-xl font-bold">Request Tester</h1>
 
             <div>
-                <button @click="registerUser" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                <button
+                    @click="registerUser"
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                >
                     Register User
                 </button>
             </div>
             <div>
-                <button @click="getUser" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                <button
+                    @click="getUser"
+                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
                     Get Authenticated User
                 </button>
             </div>
             <div>
-                <button @click="login" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                <button
+                    @click="login"
+                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
                     login
                 </button>
             </div>
 
             <div>
-                <button @click="storeJobPost" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                <button
+                    @click="storeJobPost"
+                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
                     storeJobPost
                 </button>
             </div>
             <div>
-                <button @click="getJobs" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                <button
+                    @click="getJobs"
+                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
                     getJobs
                 </button>
             </div>
             <div>
                 <div class="flex items-center gap-2">
-                    <input v-model="jobId" type="number" placeholder="Enter job ID" class="border rounded px-3 py-2" />
-                    <button @click="showJob" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    <input
+                        v-model="jobId"
+                        type="number"
+                        placeholder="Enter job ID"
+                        class="border rounded px-3 py-2"
+                    />
+                    <button
+                        @click="showJob"
+                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                    >
                         Show Job
                     </button>
                 </div>
             </div>
         </div>
         <div>
-            <div v-if="message" class="mt-4 p-4 border rounded bg-gray-100 dark:text-gray-800">
+            <div
+                v-if="message"
+                class="mt-4 p-4 border rounded bg-gray-100 dark:text-gray-800"
+            >
                 <pre>{{ message }}</pre>
                 <div v-if="error" class="mt-4 text-red-600">
                     Error: {{ error }}
@@ -48,15 +74,43 @@
         </div>
         <div>
             <form @submit.prevent="submitApplication" class="space-y-4">
-                <input v-model="formJobApplication.first_name" type="text" placeholder="First name" required />
-                <input v-model="formJobApplication.last_name" type="text" placeholder="Last name" required />
-                <input v-model="formJobApplication.email" type="email" placeholder="Email" required />
-                <input v-model="formJobApplication.phone" type="tel" placeholder="Phone (optional)" />
-                <textarea v-model="formJobApplication.cover_letter" placeholder="Cover letter (optional)" />
-                <!-- <input type="file" @change="e => formJobApplication.resume_path = e.target.files[0]"
-                    accept=".pdf,.doc,.docx" /> -->
+                <input
+                    v-model="formJobApplication.first_name"
+                    type="text"
+                    placeholder="First name"
+                    required
+                />
+                <input
+                    v-model="formJobApplication.last_name"
+                    type="text"
+                    placeholder="Last name"
+                    required
+                />
+                <input
+                    v-model="formJobApplication.email"
+                    type="email"
+                    placeholder="Email"
+                    required
+                />
+                <input
+                    v-model="formJobApplication.phone"
+                    type="tel"
+                    placeholder="Phone (optional)"
+                />
+                <textarea
+                    v-model="formJobApplication.cover_letter"
+                    placeholder="Cover letter (optional)"
+                />
+                <input
+                    type="file"
+                    @change="
+                        (e) =>
+                            (formJobApplication.resume_path = e.target.files[0])
+                    "
+                    accept=".pdf,.doc,.docx"
+                />
                 <button class="bg-amber-600" type="submit" :disabled="loading">
-                    {{ loading ? 'Submitting...' : 'Apply' }}
+                    {{ loading ? "Submitting..." : "Apply" }}
                 </button>
             </form>
         </div>
@@ -71,17 +125,17 @@ const { getCsrfCookie } = useSanctum();
 const { fetchWithCsrf, fetchPublic } = useApi();
 
 const jobId = useState("jobId", () => null);
-const loading = useState('loading', () => false);
+const loading = useState("loading", () => false);
 
 const formJobApplication = reactive({
-    first_name: 'test',
-    last_name: 'test',
-    email: 'test@mail.com',
-    phone: '0999999999',
-    cover_letter: 'test',
+    first_name: "test",
+    last_name: "test",
+    email: "test@mail.com",
+    phone: "0999999999",
+    cover_letter: "test",
     job_id: 1,
-    resume_path: 'test'
-})
+    resume_path: null,
+});
 
 const getUser = async () => {
     error.value = null;
@@ -225,33 +279,45 @@ const showJob = async () => {
 };
 
 const submitApplication = async () => {
-    loading.value = true
-    const formData = new FormData()
+    loading.value = true;
+    const formData = new FormData();
+
     for (const key in formJobApplication) {
-        if (formJobApplication[key] !== null) {
-            formData.append(key, formJobApplication[key])
+        const value = formJobApplication[key];
+
+        // Skip null/undefined
+        if (value == null) continue;
+
+        // If it's a File (resume, cover letter, etc), append as is
+        if (value instanceof File) {
+            formData.append(key, value);
+        } else {
+            formData.append(key, value.toString());
         }
     }
 
     await getCsrfCookie();
-     const xsrfToken = useCookie("XSRF-TOKEN").value;
+    const xsrfToken = useCookie("XSRF-TOKEN").value;
     try {
-         const response = await $fetch("http://localhost:8000/api/public/job-applications", {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                Accept: "application/json",
-                "X-XSRF-TOKEN": xsrfToken,
-            },
-             body: formData,
-        });
+        const response = await $fetch(
+            "http://localhost:8000/api/public/job-applications",
+            {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    Accept: "application/json",
+                    "X-XSRF-TOKEN": xsrfToken,
+                },
+                body: formData,
+            }
+        );
         // console.log(response.value)
-        alert('Application submitted!')
+        alert("Application submitted!");
     } catch (error) {
-        console.error(error)
-        alert('Something went wrong.')
+        console.error(error);
+        alert("Something went wrong.");
     } finally {
-        loading.value = false
+        loading.value = false;
     }
-}
+};
 </script>
