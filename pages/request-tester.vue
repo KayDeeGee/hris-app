@@ -158,16 +158,13 @@ const login = async () => {
         // Get CSRF token only once (first time)
         await getCsrfCookie();
 
-        const response = await fetchWithCsrf(
-            "/api/auth/login",
-            {
-                method: "POST",
-                body: {
-                    email: "kylebryanbasco@gmail.com",
-                    password: "admin123",
-                },
-            }
-        );
+        const response = await fetchWithCsrf("/api/auth/login", {
+            method: "POST",
+            body: {
+                email: "kylebryanbasco@gmail.com",
+                password: "admin123",
+            },
+        });
 
         message.value = response;
     } catch (err) {
@@ -180,18 +177,15 @@ const registerUser = async () => {
     message.value = null;
 
     try {
-        const response = await fetchWithCsrf(
-            "/api/auth/register",
-            {
-                method: "POST",
-                body: {
-                    last_name: "Basco",
-                    first_name: "Kyle Bryan",
-                    email: "kylebryanbasco@gmail.com",
-                    password: "admin123",
-                },
-            }
-        );
+        const response = await fetchWithCsrf("/api/auth/register", {
+            method: "POST",
+            body: {
+                last_name: "Basco",
+                first_name: "Kyle Bryan",
+                email: "kylebryanbasco@gmail.com",
+                password: "admin123",
+            },
+        });
 
         message.value = response;
     } catch (err) {
@@ -245,12 +239,9 @@ const getJobs = async () => {
     message.value = null;
 
     try {
-        const response = await fetchPublic(
-            `/api/public/job-posts`,
-            {
-                method: "GET",
-            }
-        );
+        const response = await fetchPublic(`/api/public/job-posts`, {
+            method: "GET",
+        });
 
         message.value = response;
     } catch (err) {
@@ -299,18 +290,10 @@ const submitApplication = async () => {
     await getCsrfCookie();
     const xsrfToken = useCookie("XSRF-TOKEN").value;
     try {
-        const response = await $fetch(
-            "/api/public/job-applications",
-            {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    Accept: "application/json",
-                    "X-XSRF-TOKEN": xsrfToken,
-                },
-                body: formData,
-            }
-        );
+        const response = await fetchWithCsrf("/api/public/job-applications", {
+            method: "POST",
+            body: formData,
+        });
         // console.log(response.value)
         alert("Application submitted!");
     } catch (error) {
