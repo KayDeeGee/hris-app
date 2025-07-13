@@ -13,4 +13,17 @@ declare global {
         created_at: string;
         updated_at: string;
     }
+
+    interface EmployeeDetail {
+        employeeNumber: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+        phone: string;
+        jobTitle: string | null;
+        department?: string;
+        dateHired: string;
+        status: string;
+        qrCodePath?: string;
+    }
 }

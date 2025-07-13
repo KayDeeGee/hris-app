@@ -1,6 +1,7 @@
 <template>
     <div>
         dashboard
+        schedule management
     </div>
 </template>
 
