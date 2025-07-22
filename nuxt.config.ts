@@ -2,14 +2,18 @@
 export default defineNuxtConfig({
     compatibilityDate: "2025-05-15",
     devtools: { enabled: true },
-    modules: ["@nuxt/ui", "@nuxtjs/color-mode"],
-    css: ["~/assets/css/main.css"],
+    modules: ["@nuxt/ui"],
     runtimeConfig: {
         public: {
             backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL,
         },
     },
-     colorMode: {
-       preference: 'light' // Optional: Set default to light
-     }
+    colorMode: {
+        preference: "light", // Optional: Set default to light
+    },
+    tailwindcss: {
+        exposeConfig: true,
+        viewer: true,
+    },
+    css: ["@/assets/css/main.css"],
 });

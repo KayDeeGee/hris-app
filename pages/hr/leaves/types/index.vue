@@ -1,65 +1,76 @@
 <template>
-    <div class="p-4">
-        <h1 class="text-xl font-bold mb-4">Employee List</h1>
-        <div class="overflow-auto rounded shadow">
-            <table class="min-w-full text-sm text-left border border-gray-200">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-4 py-2 border">Employee #</th>
-                        <th class="px-4 py-2 border">Name</th>
-                        <th class="px-4 py-2 border">Email</th>
-                        <th class="px-4 py-2 border">Phone</th>
-                        <th class="px-4 py-2 border">Job Title</th>
-                        <th class="px-4 py-2 border">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        v-for="(employee, index) in employees"
-                        :key="index"
-                        class="hover:bg-gray-50"
-                    >
-                        <td class="px-4 py-2 border">
-                            {{ employee.employeeNumber }}
-                        </td>
-                        <td class="px-4 py-2 border">
-                            {{ employee.firstName }} {{ employee.lastName }}
-                        </td>
-                        <td class="px-4 py-2 border">{{ employee.email }}</td>
-                        <td class="px-4 py-2 border">{{ employee.phone }}</td>
-                        <td class="px-4 py-2 border">
-                            {{ employee.jobTitle ?? "—" }}
-                        </td>
-                        <td class="px-4 py-2 border space-x-2">
-                            <!-- modal, next prev employee profile -->
-                            <NuxtLink
-                                :to="`/hr/employees/${employee.employeeNumber}`"
-                                class="text-blue-600 hover:underline"
-                            >
-                                View
-                            </NuxtLink>
-                            <button class="text-green-600 hover:underline">
-                                Edit
-                            </button>
-                            <button class="text-red-600 hover:underline">
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    <div>
+        <UTable :rows="rows" :columns="columns" :loading="loading">
+            <template #actions-data="{ row }">
+                <div class="flex gap-2">
+                    <UButton
+                        icon="i-heroicons-pencil"
+                        size="xs"
+                        @click="showEdit(row)"
+                    />
+                    <UButton
+                        icon="i-heroicons-trash"
+                        size="xs"
+                        color="red"
+                        @click="showDelete(row)"
+                    />
+                </div>
+            </template>
+        </UTable>
 
-
+        <BaseConfirmModal
+            v-model="showEditModal"
+            title="Edit Leave Type?"
+            confirmText="Yes, Edit"
+            cancelText="Cancel"
+            confirmColor="red"
+            @confirm="confirmEdit"
+            @cancel="cancelEdit"
+            @close="cancelEdit"
+        >
+            <div v-if="selectedRow">
+                <div class="">
+                    <UFormGroup label="Name">
+                        <UInput v-model="editForm.name" />
+                    </UFormGroup>
+                    <UFormGroup label="Description">
+                        <UInput v-model="editForm.description" />
+                    </UFormGroup>
+                    <UFormGroup label="Notice Days">
+                        <UInput v-model="editForm.notice_days" type="number" />
+                    </UFormGroup>
+                    <UFormGroup label="Value">
+                        <UInput v-model="editForm.value" />
+                    </UFormGroup>
+                </div>
+            </div>
+        </BaseConfirmModal>
+        <BaseConfirmModal
+            v-model="showDeleteModal"
+            title="Delete Leave Type?"
+            confirmText="Yes, Delete"
+            cancelText="Cancel"
+            confirmColor="red"
+            @confirm="confirmDelete"
+            @cancel="cancelDelete"
+            @close="cancelDelete"
+        >
+            <div v-if="selectedRow" class="space-y-2 text-sm text-gray-700">
+                <p><strong>Name:</strong> {{ selectedRow.name }}</p>
+                <p>
+                    <strong>Description:</strong> {{ selectedRow.description }}
+                </p>
+                <p>
+                    <strong>Notice Days:</strong> {{ selectedRow.notice_days }}
+                </p>
+                <p><strong>Value:</strong> {{ selectedRow.value }}</p>
+            </div>
+        </BaseConfirmModal>
     </div>
 </template>
 
 <script setup lang="ts">
-const { fetchWithCsrf } = useApi()
-
-const { data: employees } = await useAsyncData<any>("employees", () =>
-    fetchWithCsrf("/api/hr/employees")
-);
+const { fetchWithCsrf } = useApi();
 
 const rows = ref<LeaveType[]>([]);
 const loading = ref(false);
@@ -67,12 +78,37 @@ const showEditModal = ref(false);
 const showDeleteModal = ref(false);
 const selectedRow = ref<LeaveType | null>(null);
 
+// Form data for editing
 const editForm = ref({
     name: "",
     description: "",
     notice_days: 0,
     value: 0,
 });
+
+const columns = [
+    {
+        key: "name",
+        label: "Name",
+    },
+    {
+        key: "description",
+        label: "Description",
+    },
+    {
+        key: "notice_days",
+        label: "Notice Days",
+    },
+    {
+        key: "value",
+        label: "Value",
+    },
+    {
+        key: "actions",
+        label: "Actions",
+        sortable: false,
+    },
+];
 
 function showEdit(row: LeaveType) {
     console.log("Editing row:", row);
@@ -184,5 +220,3 @@ onMounted(async () => {
     }
 });
 </script>
-
-<style scoped></style>

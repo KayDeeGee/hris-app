@@ -26,4 +26,19 @@ declare global {
         status: string;
         qrCodePath?: string;
     }
+
+    interface LeaveRequest {
+        id: number;
+        created_at: string;
+        status: string;
+        leave_type: LeaveType;
+    }
+
+    interface LeaveType {
+        id: number;
+        name: string;
+        description?: string;
+        notice_days: number;
+        value: number;
+    }
 }
