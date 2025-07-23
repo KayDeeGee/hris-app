@@ -140,12 +140,13 @@ const transformEmployees = (data: any[]) => {
 };
 
 const showEdit = (row: any) => {
+    console.log("Editing row:", row);
     selectedRow.value = row;
 
     // Populate the form with current data
     editForm.value = {
-        first_name: row.first_name,
-        last_name: row.last_name ?? "",
+        first_name: row.firstName,
+        last_name: row.lastName ?? "",
         email: row.email ?? 0,
         phone: row.phone ?? 1,
         job_id: row.job_id ?? 1,
