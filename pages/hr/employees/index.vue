@@ -36,7 +36,7 @@
 
         <BaseConfirmModal
             v-model="showEditModal"
-            title="Edit Leave Type?"
+            title="Quick Edit"
             confirmText="Yes, Edit"
             cancelText="Cancel"
             confirmColor="red"
@@ -47,16 +47,28 @@
             <div v-if="selectedRow">
                 <div class="">
                     <UFormGroup label="Name">
-                        <UInput v-model="editForm.name" />
+                        <UInput v-model="editForm.first_name" />
                     </UFormGroup>
                     <UFormGroup label="Description">
-                        <UInput v-model="editForm.description" />
+                        <UInput v-model="editForm.last_name" />
                     </UFormGroup>
                     <UFormGroup label="Notice Days">
-                        <UInput v-model="editForm.notice_days" type="number" />
+                        <UInput v-model="editForm.email" type="email" />
                     </UFormGroup>
                     <UFormGroup label="Value">
-                        <UInput v-model="editForm.value" />
+                        <UInput v-model="editForm.phone" />
+                    </UFormGroup>
+                    <UFormGroup label="Job Position">
+                        <USelect
+                            v-model="editForm.job_id"
+                            :options="
+                                jobStore.jobPosts.map((job) => ({
+                                    label: job.title,
+                                    value: job.id,
+                                }))
+                            "
+                            placeholder="Select a job position"
+                        />
                     </UFormGroup>
                 </div>
             </div>
@@ -87,9 +99,11 @@
 
 <script setup lang="ts">
 const { fetchWithCsrf } = useApi();
-const loading = ref(false);
-const rows = ref<any[]>([]);
+const jobStore = useJobPostStore();
 
+const loading = ref(false);
+
+const rows = ref<any[]>([]);
 const columns = [
     { key: "employeeNumber", label: "Employee #" },
     {
@@ -103,6 +117,19 @@ const columns = [
     { key: "actions", label: "Actions" },
 ];
 
+//modal functions
+const showEditModal = ref(false);
+const showDeleteModal = ref(false);
+const selectedRow = ref<LeaveType | null>(null);
+
+const editForm = ref({
+    first_name: "",
+    last_name: "",
+    email: 0,
+    phone: 0,
+    job_id: 0,
+});
+
 // Transform employee data
 const transformEmployees = (data: any[]) => {
     return data.map((emp) => ({
@@ -112,25 +139,57 @@ const transformEmployees = (data: any[]) => {
     }));
 };
 
-onMounted(async () => {
-    loading.value = true;
-    try {
-        const res = await fetchWithCsrf<any[]>("/api/hr/employees");
-        rows.value = transformEmployees(res);
-    } catch (err) {
-        console.error("Failed to fetch employees", err);
-    } finally {
-        loading.value = false;
-    }
-});
-
 const showEdit = (row: any) => {
-    console.log("Editing", row);
-    // TODO: open edit modal with row data
+    selectedRow.value = row;
+
+    // Populate the form with current data
+    editForm.value = {
+        first_name: row.first_name,
+        last_name: row.last_name ?? "",
+        email: row.email ?? 0,
+        phone: row.phone ?? 1,
+        job_id: row.job_id ?? 1,
+    };
+
+    // Show the modal
+    showEditModal.value = true;
 };
 
 const showDelete = (row: any) => {
     console.log("Deleting", row);
     // TODO: open delete confirm modal with row
 };
+
+const confirmEdit = () => {
+    console.log("Confirmed edit");
+    // TODO: update row data
+};
+
+const confirmDelete = () => {
+    console.log("Confirmed delete");
+    // TODO: delete row
+};
+
+const cancelEdit = () => {
+    console.log("Canceled edit");
+    // TODO: close edit modal
+};
+
+const cancelDelete = () => {
+    console.log("Canceled delete");
+    // TODO: close delete confirm modal
+};
+
+onMounted(async () => {
+    loading.value = true;
+    try {
+        const res = await fetchWithCsrf<any[]>("/api/hr/employees");
+        rows.value = transformEmployees(res);
+        jobStore.fetchJobs();
+    } catch (err) {
+        console.error("Failed to fetch employees", err);
+    } finally {
+        loading.value = false;
+    }
+});
 </script>

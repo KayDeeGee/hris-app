@@ -41,4 +41,9 @@ declare global {
         notice_days: number;
         value: number;
     }
+
+    interface JobPost {
+        id: number;
+        title: string;
+    }
 }
