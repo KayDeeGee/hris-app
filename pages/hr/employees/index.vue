@@ -6,6 +6,7 @@
             :rows="rows"
             :columns="columns"
             :loading="loading"
+            :row-key="(row: EmployeeRow) => row.employeeNumber"
             :ui="{
                 td: { base: 'align-top' },
                 thead: 'bg-gray-100',
@@ -55,7 +56,7 @@
                     <UFormGroup label="Notice Days">
                         <UInput v-model="editForm.email" type="email" />
                     </UFormGroup>
-                    <UFormGroup label="Value">
+                    <UFormGroup label="Phone Number">
                         <UInput v-model="editForm.phone" />
                     </UFormGroup>
                     <UFormGroup label="Job Position">
@@ -103,7 +104,8 @@ const jobStore = useJobPostStore();
 
 const loading = ref(false);
 
-const rows = ref<any[]>([]);
+
+const rows = ref<EmployeeRow[]>([]);
 const columns = [
     { key: "employeeNumber", label: "Employee #" },
     {
@@ -120,7 +122,7 @@ const columns = [
 //modal functions
 const showEditModal = ref(false);
 const showDeleteModal = ref(false);
-const selectedRow = ref<LeaveType | null>(null);
+const selectedRow = ref<any | null>(null);
 
 const editForm = ref({
     first_name: "",
@@ -158,27 +160,75 @@ const showEdit = (row: any) => {
 
 const showDelete = (row: any) => {
     console.log("Deleting", row);
-    // TODO: open delete confirm modal with row
+
+    showDeleteModal.value = true;
 };
 
-const confirmEdit = () => {
+const confirmEdit = async () => {
     console.log("Confirmed edit");
-    // TODO: update row data
+    if (!selectedRow.value) return;
+
+    try {
+        const updatedData = await fetchWithCsrf(
+            "/api/hr/employees/" + selectedRow.value.employeeNumber,
+            {
+                method: "PUT",
+                body: editForm.value,
+            }
+        );
+
+         // Update the row in the table
+        const index = rows.value.findIndex(
+            (r) => r.employeeNumber === selectedRow.value!.employeeNumber
+        );
+        if (index !== -1) {
+            rows.value[index] = { ...selectedRow.value, ...editForm.value, fullName: `${editForm.value.first_name} ${editForm.value.last_name}` };
+        }
+
+        showDeleteModal.value = false;
+        selectedRow.value = null;
+        console.log(editForm.value);
+    } catch (error) {
+        console.error("Failed to delete:", error);
+    }
 };
 
-const confirmDelete = () => {
-    console.log("Confirmed delete");
-    // TODO: delete row
+const confirmDelete = async () => {
+      if (!selectedRow.value) return;
+
+    try {
+        await fetchWithCsrf("/api/hr/employees/" + selectedRow.value.employeeNumber, {
+            method: "DELETE",
+        });
+
+        rows.value = rows.value.filter(
+            (row) => row.employeeNumber !== selectedRow.value!.employeeNumber
+        );
+
+        showDeleteModal.value = false;
+        selectedRow.value = null;
+    } catch (error) {
+        console.error("Failed to delete:", error);
+    }
 };
 
 const cancelEdit = () => {
     console.log("Canceled edit");
-    // TODO: close edit modal
+    selectedRow.value = null;
+
+    editForm.value = {
+        first_name: "",
+        last_name: "",
+        email: 0,
+        phone: 0,
+        job_id: 0,
+    };
+    showEditModal.value = false;
 };
 
 const cancelDelete = () => {
-    console.log("Canceled delete");
-    // TODO: close delete confirm modal
+    selectedRow.value = null;
+    showDeleteModal.value = false;
 };
 
 onMounted(async () => {

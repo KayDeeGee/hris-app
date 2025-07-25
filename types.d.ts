@@ -46,4 +46,14 @@ declare global {
         id: number;
         title: string;
     }
+
+    interface EmployeeRow {
+        employeeNumber: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+        phone: string;
+        jobTitle: string | null;
+        status: string;
+    }
 }

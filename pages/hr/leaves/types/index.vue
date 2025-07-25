@@ -129,7 +129,6 @@ function showEdit(row: LeaveType) {
 }
 
 function cancelEdit() {
-    showEditModal.value = false;
     selectedRow.value = null;
     // Reset form
     editForm.value = {
@@ -138,6 +137,8 @@ function cancelEdit() {
         notice_days: 0,
         value: 0,
     };
+
+    showEditModal.value = false;
 }
 
 async function confirmEdit() {
