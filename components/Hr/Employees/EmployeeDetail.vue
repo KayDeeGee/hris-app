@@ -16,6 +16,8 @@
 </template>
 
 <script setup>
+const { fetchWithCsrf } = useApi();
+
 
 </script>
 

@@ -56,4 +56,24 @@ declare global {
         jobTitle: string | null;
         status: string;
     }
+
+    interface AttendanceRecord {
+      id: number;
+      employee_id: number;
+      date: string;
+      time_in: string;
+      time_out: string;
+      total_hours: number;
+      late_duration: number;
+    }
+    
+    interface PaginatedAttendanceRecord {
+      data: AttendanceRecord[];
+      current_page: number;
+      last_page: number;
+      per_page: number;
+      total: number;
+      from: number;
+      to: number;
+    }
 }

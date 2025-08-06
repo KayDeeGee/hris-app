@@ -179,6 +179,7 @@ const confirmEdit = async () => {
 
          // Update the row in the table
         const index = rows.value.findIndex(
+            
             (r) => r.employeeNumber === selectedRow.value!.employeeNumber
         );
         if (index !== -1) {
