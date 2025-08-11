@@ -122,7 +122,6 @@
 
         <!-- Leave Requests Table -->
         <UTable
-            v-if="!loading && (filteredLeaveRequests?.length ?? 0) > 0"
             :rows="filteredLeaveRequests"
             :columns="leaveColumns"
             class="w-full"
@@ -235,7 +234,7 @@
 <script setup lang="ts">
 const { fetchWithCsrf } = useApi();
 interface LeaveApiResponse {
-    data: any[];
+    requests: any[];
     credits: {
         total_credits: number;
         used_credits: number;
@@ -266,18 +265,19 @@ const leaveColumns = [
 const fetchLeaveDetails = async () => {
     loading.value = true;
     try {
-        const response = await fetchWithCsrf<LeaveApiResponse>(
-            "/api/employee/leaves"
-        );
+        const response = await fetchWithCsrf<any>("/api/employee/leaves");
 
-        leaveRequests.value = response.data;
+        leaveRequests.value = response.requests.data ?? [];
         console.log("Fetched leave details:", response);
+        console.log(leaveRequests.value, "wow");
 
         totalCredits.value = {
             available:
                 response.credits.total_credits - response.credits.used_credits,
             used: response.credits.used_credits,
         };
+
+        console.log(totalCredits.value);
     } catch (error) {
         console.error("Failed to fetch leave requests:", error);
     } finally {
