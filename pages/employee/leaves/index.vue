@@ -17,7 +17,7 @@
             <!-- Total Leave Credits Card -->
             <UCard
                 class="hover:shadow-lg transition-shadow cursor-pointer"
-                @click="$router.push('/leaves/credits')"
+                @click="$router.push('leaves/credits')"
             >
                 <template #header>
                     <div class="flex items-center justify-between">

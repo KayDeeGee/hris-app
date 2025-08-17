@@ -1,18 +1,25 @@
 import { defineStore } from "pinia";
 
+interface User {
+    id: number;
+    name: string;
+    role: string;
+}
+
 export const useAuthStore = defineStore("auth", () => {
-    const user = ref(null);
+    const user = ref<User | null>(null);
 
     const isAuthenticated = computed(() => !!user.value);
-    const isAdmin = computed(() => user.value?.role === "admin");
+    const isAdmin = computed(() => user.value?.role?.toLowerCase() === "admin");
 
     async function fetchUser() {
         try {
-            const { data } = await useApi().fetchWithCsrf("/api/user", {
+            const userData = await useApi().fetchWithCsrf<User>("/api/user", {
                 credentials: "include",
             });
-            user.value = data.value;
+            user.value = userData;
         } catch (error) {
+            console.error("Failed to fetch user:", error);
             user.value = null;
         }
     }
