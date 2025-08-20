@@ -232,6 +232,10 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: "auth",
+})
+
 const { fetchWithCsrf } = useApi();
 interface LeaveApiResponse {
     requests: any[];

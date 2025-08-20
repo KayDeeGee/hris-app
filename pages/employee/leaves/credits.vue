@@ -68,6 +68,10 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: "auth",
+})
+
 const { fetchWithCsrf } = useApi();
 
 const credits = ref<any>([]);

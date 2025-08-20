@@ -525,6 +525,9 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: "auth",
+})
 // Types
 interface AttendanceRecord {
     id: number;
