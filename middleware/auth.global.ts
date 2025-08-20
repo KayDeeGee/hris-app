@@ -13,22 +13,22 @@ export default defineNuxtRouteMiddleware(async (to) => {
         "/register",
     ];
 
-    const isPublic = publicPaths.some((path) => to.path.startsWith(path));
-    // Only fetch user if not already authenticated
-    if (!authStore.isAuthenticated && !isPublic) {
-        await authStore.fetchUser();
-    }
+    // const isPublic = publicPaths.some((path) => to.path.startsWith(path));
+    // // Only fetch user if not already authenticated
+    // if (!authStore.isAuthenticated && !isPublic) {
+    //     await authStore.fetchUser();
+    // }
 
-    // Redirect to login if still not logged in
-    if (!authStore.isAuthenticated && !isPublic) {
-        return navigateTo("/login");
-    }
+    // // Redirect to login if still not logged in
+    // if (!authStore.isAuthenticated && !isPublic) {
+    //     return navigateTo("/login");
+    // }
 
-    // Optional: Role-based route restrictions
-    if (to.path.startsWith("/hr") && authStore.user?.role !== "HR") {
-        return navigateTo("/unauthorized");
-    }
-    if (to.path.startsWith("/manager") && authStore.user?.role !== "Manager") {
-        return navigateTo("/unauthorized");
-    }
+    // // Optional: Role-based route restrictions
+    // if (to.path.startsWith("/hr") && authStore.user?.role !== "HR") {
+    //     return navigateTo("/unauthorized");
+    // }
+    // if (to.path.startsWith("/manager") && authStore.user?.role !== "Manager") {
+    //     return navigateTo("/unauthorized");
+    // }
 });

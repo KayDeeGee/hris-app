@@ -1,44 +1,94 @@
-<script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
-const authStore = useAuthStore()
-
-// Define sidebar links per role
-const menuByRole = {
-  HR: [
-    { name: 'Dashboard', icon: 'i-heroicons-home', path: '/hr/dashboard' },
-    { name: 'Employees', icon: 'i-heroicons-users', path: '/hr/employees' },
-    { name: 'Leave Requests', icon: 'i-heroicons-calendar', path: '/hr/leaves' },
-  ],
-  Manager: [
-    { name: 'Team Dashboard', icon: 'i-heroicons-home', path: '/manager/dashboard' },
-    { name: 'Leave Approvals', icon: 'i-heroicons-check-circle', path: '/manager/leaves' },
-  ],
-  Employee: [
-    { name: 'My Profile', icon: 'i-heroicons-user', path: '/employee/profile' },
-    { name: 'My Leaves', icon: 'i-heroicons-calendar', path: '/employee/leaves/credits' },
-  ]
-}
-
-// Reactive menu for the logged-in user's role
-const menuItems = computed(() => menuByRole[authStore.role] || [])
-</script>
-
+<!-- components/Sidebar.vue -->
 <template>
-  <aside class="bg-gray-900 text-white w-64 min-h-screen p-4">
-    <div class="mb-8 text-xl font-bold">HRIS</div>
-    <nav class="space-y-2">
-      <button
-        v-for="item in menuItems"
-        :key="item.path"
-        @click="router.push(item.path)"
-        class="flex items-center space-x-2 w-full text-left px-3 py-2 rounded hover:bg-gray-700 transition"
-      >
-        <span :class="item.icon"></span>
-        <span>{{ item.name }}</span>
-      </button>
+  <aside class="h-screen w-64 bg-gray-800 text-white flex flex-col shadow-lg">
+    <!-- Logo / App Name -->
+    <div class="p-6 text-2xl font-bold border-b border-gray-700">
+      MyApp
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="flex-1 p-4 space-y-6 overflow-y-auto">
+      <!-- Employee Section -->
+      <div>
+        <h3 class="px-4 text-xs uppercase tracking-wider text-gray-400 mb-2">
+          Employee
+        </h3>
+        <div class="space-y-1">
+          <NuxtLink
+            v-for="link in employeeLinks"
+            :key="link.to"
+            :to="link.to"
+            class="block px-4 py-2 rounded-lg hover:bg-gray-700 transition"
+            active-class="bg-gray-700"
+          >
+            {{ link.label }}
+          </NuxtLink>
+        </div>
+      </div>
+
+      <!-- HR Section -->
+      <div>
+        <h3 class="px-4 text-xs uppercase tracking-wider text-gray-400 mb-2">
+          HR
+        </h3>
+        <div class="space-y-1">
+          <NuxtLink
+            v-for="link in hrLinks"
+            :key="link.to"
+            :to="link.to"
+            class="block px-4 py-2 rounded-lg hover:bg-gray-700 transition"
+            active-class="bg-gray-700"
+          >
+            {{ link.label }}
+          </NuxtLink>
+        </div>
+      </div>
+
+      <!-- Manager Section -->
+      <div>
+        <h3 class="px-4 text-xs uppercase tracking-wider text-gray-400 mb-2">
+          Manager
+        </h3>
+        <div class="space-y-1">
+          <NuxtLink
+            v-for="link in managerLinks"
+            :key="link.to"
+            :to="link.to"
+            class="block px-4 py-2 rounded-lg hover:bg-gray-700 transition"
+            active-class="bg-gray-700"
+          >
+            {{ link.label }}
+          </NuxtLink>
+        </div>
+      </div>
     </nav>
+
+    <!-- Footer -->
+    <div class="p-4 border-t border-gray-700 text-sm text-gray-400">
+      © 2025 MyApp
+    </div>
   </aside>
 </template>
+
+<script setup lang="ts">
+const employeeLinks = [
+  { label: "Dashboard", to: "/employee" },
+  { label: "Profile", to: "/employee/profile" },
+  { label: "Leaves", to: "/employee/leaves" },
+  { label: "Overtime", to: "/employee/overtime" },
+]
+
+const hrLinks = [
+  { label: "Dashboard", to: "/hr/dashboard" },
+  { label: "Employees", to: "/hr/employees" },
+  { label: "Leave Requests", to: "/hr/leaves" },
+  { label: "Reports", to: "/hr/reports" },
+]
+
+const managerLinks = [
+  { label: "Dashboard", to: "/manager/dashboard" },
+  { label: "Team", to: "/manager/team" },
+  { label: "Approvals", to: "/manager/approvals" },
+  { label: "Analytics", to: "/manager/analytics" },
+]
+</script>
