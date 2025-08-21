@@ -27,7 +27,7 @@
       </div>
 
       <!-- HR Section -->
-      <div>
+      <!-- <div>
         <h3 class="px-4 text-xs uppercase tracking-wider text-gray-400 mb-2">
           HR
         </h3>
@@ -42,10 +42,10 @@
             {{ link.label }}
           </NuxtLink>
         </div>
-      </div>
+      </div> -->
 
       <!-- Manager Section -->
-      <div>
+      <!-- <div>
         <h3 class="px-4 text-xs uppercase tracking-wider text-gray-400 mb-2">
           Manager
         </h3>
@@ -60,7 +60,7 @@
             {{ link.label }}
           </NuxtLink>
         </div>
-      </div>
+      </div> -->
     </nav>
 
     <!-- Footer -->
@@ -76,19 +76,20 @@ const employeeLinks = [
   { label: "Profile", to: "/employee/profile" },
   { label: "Leaves", to: "/employee/leaves" },
   { label: "Overtime", to: "/employee/overtime" },
+  { label: "Equipments", to: "/employee/equipments" },
 ]
 
-const hrLinks = [
-  { label: "Dashboard", to: "/hr/dashboard" },
-  { label: "Employees", to: "/hr/employees" },
-  { label: "Leave Requests", to: "/hr/leaves" },
-  { label: "Reports", to: "/hr/reports" },
-]
+// const hrLinks = [
+//   { label: "Dashboard", to: "/hr/dashboard" },
+//   { label: "Employees", to: "/hr/employees" },
+//   { label: "Leave Requests", to: "/hr/leaves" },
+//   { label: "Reports", to: "/hr/reports" },
+// ]
 
-const managerLinks = [
-  { label: "Dashboard", to: "/manager/dashboard" },
-  { label: "Team", to: "/manager/team" },
-  { label: "Approvals", to: "/manager/approvals" },
-  { label: "Analytics", to: "/manager/analytics" },
-]
+// const managerLinks = [
+//   { label: "Dashboard", to: "/manager/dashboard" },
+//   { label: "Team", to: "/manager/team" },
+//   { label: "Approvals", to: "/manager/approvals" },
+//   { label: "Analytics", to: "/manager/analytics" },
+// ]
 </script>

@@ -103,6 +103,10 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: "auth",
+})
+
 const { fetchWithCsrf } = useApi();
 const loading = ref(false);
 const totalOvertime = ref(0);
@@ -117,7 +121,7 @@ const form = ref({
 // Table setup
 const columns = [
     { key: "date", label: "Date" },
-    { key: "hours", label: "Hours" },
+    { key: "duration", label: "Duration (hrs)" },
     { key: "reason", label: "Reason" },
     { key: "status", label: "Status" },
 ];
@@ -132,11 +136,15 @@ const overtime = ref({
 
 const fetchOvertime = async (page = 1) => {
     const res = await fetchWithCsrf<any>(`/api/employee/overtime?page=${page}`);
+        console.log(res, 'wow');
+
     overtime.value = res;
 };
 
 const fetchTotalOvertime = async () => {
     const res = await fetchWithCsrf<any>("/api/employee/overtime/total");
+        console.log(res, 'wow');
+
     totalOvertime.value = res.total;
 };
 
@@ -149,7 +157,7 @@ const submitOvertime = async () => {
         });
         // await fetchOvertime(overtime.value.current_page); // refresh table
         // await fetchTotalOvertime();
-        console.log(res);
+        console.log(res, 'wow');
         form.value = { date: "", hours: "", reason: "" };
     } finally {
         loading.value = false;
