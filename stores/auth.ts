@@ -14,9 +14,12 @@ export const useAuthStore = defineStore("auth", () => {
 
     async function fetchUser() {
         try {
-            const userData = await useApi().fetchWithCsrf<User>("/api/user", {
-                credentials: "include",
-            });
+            const userData = await useApi().fetchWithCsrf<User>(
+                "/api/auth/user",
+                {
+                    credentials: "include",
+                }
+            );
             user.value = userData;
         } catch (error) {
             console.error("Failed to fetch user:", error);
